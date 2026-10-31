@@ -1,0 +1,31 @@
+{
+ "CYP3A4|glass box": {
+  "mcc": 0.3253,
+  "sd": 0.0101,
+  "n_terms": 152,
+  "rate_argmax": 0.47000000000000003,
+  "rate_1se": 0.42000000000000004
+ },
+ "CYP3A4|morgan only": {
+  "mcc": 0.3009,
+  "sd": 0.0074,
+  "n_terms": 104,
+  "rate_argmax": 0.48000000000000004,
+  "rate_1se": 0.42000000000000004
+ },
+ "CYP2D6|glass box": {
+  "mcc": 0.1907,
+  "sd": 0.007,
+  "n_terms": 88,
+  "rate_argmax": 0.22,
+  "rate_1se": 0.16999999999999998
+ },
+ "CYP2D6|morgan only": {
+  "mcc": 0.1864,
+  "sd": 0.0058,
+  "n_terms": 56,
+  "rate_argmax": 0.12000000000000001,
+  "rate_1se": 0.1
+ },
+ "macro": 0.258
+}

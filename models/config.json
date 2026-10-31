@@ -1,0 +1,4 @@
+{
+  "CYP3A4": {"harvest": false, "morgan": 64, "casper": 32, "mordred": 16, "C": 0.1, "rho": 0.7},
+  "CYP2D6": {"harvest": true,  "morgan": 16, "casper": 16, "mordred": 16, "C": 0.1, "rho": 0.7}
+}

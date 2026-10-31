@@ -1,0 +1,13 @@
+assembled (6145, 26)   blinded test (750, 2)
+  CYP1A2: derived labels agree with the released column on 1.0000 of 1412 rows   suspect=1
+  CYP2C9: derived labels agree with the released column on 1.0000 of 1285 rows   suspect=0
+  CYP2D6: derived labels agree with the released column on 1.0000 of 1493 rows   suspect=4
+  CYP3A4: derived labels agree with the released column on 1.0000 of 2528 rows   suspect=1055
+
+  CYP2D6: measured pool n=1493 prevalence=0.217   +harvested n=4213 prevalence=0.077
+  CYP3A4: measured pool n=2528 prevalence=0.302   +harvested n=2732 prevalence=0.280
+
+Butina grouping for grouped CV (this is the slow step)...
+  4981 clusters over 6145 compounds
+
+wrote data/tdi_train.csv, tdi_harvested.csv, tdi_test.csv, groups.npy

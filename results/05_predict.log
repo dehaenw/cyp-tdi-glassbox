@@ -1,0 +1,4 @@
+CYP2D6: 88 terms  rate=0.200 -> 150/750 calls   (absolute prob_cut would call 115; 35 differ)
+CYP3A4: 152 terms  rate=0.460 -> 345/750 calls   (absolute prob_cut would call 384; 39 differ)
+VALIDATION: PASS
+wrote predictions/submission.csv/.parquet

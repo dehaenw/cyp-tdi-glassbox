@@ -1,0 +1,54 @@
+====================================================================================================
+CYP3A4   deployed block 0.3331   sweep cells min 0.3136 median 0.3223 max 0.3336
+
+  marginal by ARM (mean over 9 cells each)
+    A  probe 0.0  d16  ac 12Ax8   (reference)     0.3266  -0.0065
+    B  probe 1.4  d16  ac 12Ax8   water-accessible surface 0.3232  -0.0099
+    C  probe 0.0  d16  ac 18Ax12  longer reach    0.3235  -0.0096
+    D  probe 0.0  d24  ac 12Ax8   finer surface sampling 0.3210  -0.0121
+    E  probe 0.0  d16  ac 12Ax16  finer distance bins 0.3233  -0.0098
+
+  marginal by N_CONFS (mean over 15 cells each)
+    first  5 conformers                              0.3241  -0.0090
+    first 10 conformers                              0.3226  -0.0105
+    first 20 conformers                              0.3239  -0.0093
+
+  marginal by CONF_POOL (mean over 15 cells each)
+    mean                                             0.3235  -0.0096
+    mean+std                                         0.3237  -0.0094
+    mean+std+min+max                                 0.3233  -0.0098
+
+  top cells (upward-biased; for reference only)
+    A|k5|mean+std+min+max   0.3336  +0.0005  (960 col)
+    E|k5|mean+std+min+max   0.3323  -0.0008  (1344 col)
+    C|k5|mean+std           0.3322  -0.0010  (576 col)
+    B|k10|mean               0.3317  -0.0014  (240 col)
+    B|k20|mean               0.3304  -0.0027  (240 col)
+    C|k5|mean+std+min+max   0.3300  -0.0032  (1152 col)
+====================================================================================================
+CYP2D6   deployed block 0.1921   sweep cells min 0.1652 median 0.1782 max 0.1908
+
+  marginal by ARM (mean over 9 cells each)
+    A  probe 0.0  d16  ac 12Ax8   (reference)     0.1816  -0.0105
+    B  probe 1.4  d16  ac 12Ax8   water-accessible surface 0.1713  -0.0209
+    C  probe 0.0  d16  ac 18Ax12  longer reach    0.1817  -0.0104
+    D  probe 0.0  d24  ac 12Ax8   finer surface sampling 0.1819  -0.0102
+    E  probe 0.0  d16  ac 12Ax16  finer distance bins 0.1797  -0.0124
+
+  marginal by N_CONFS (mean over 15 cells each)
+    first  5 conformers                              0.1803  -0.0119
+    first 10 conformers                              0.1811  -0.0110
+    first 20 conformers                              0.1764  -0.0158
+
+  marginal by CONF_POOL (mean over 15 cells each)
+    mean                                             0.1778  -0.0143
+    mean+std                                         0.1793  -0.0128
+    mean+std+min+max                                 0.1806  -0.0115
+
+  top cells (upward-biased; for reference only)
+    A|k10|mean+std           0.1908  -0.0014  (480 col)
+    D|k5|mean+std+min+max   0.1904  -0.0017  (960 col)
+    E|k10|mean+std+min+max   0.1901  -0.0020  (1344 col)
+    C|k10|mean+std+min+max   0.1885  -0.0036  (1152 col)
+    E|k10|mean+std           0.1882  -0.0039  (672 col)
+    C|k5|mean+std+min+max   0.1882  -0.0040  (1152 col)

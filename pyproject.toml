@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cyp-tdi-glassbox"
+version = "1.0.0"
+description = "A natively interpretable linear model for CYP time-dependent inhibition"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [{name = "Wim Dehaen"}]
+keywords = ["cheminformatics", "cytochrome-p450", "interpretability", "ADMET"]
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "scipy>=1.10",
+    "scikit-learn>=1.3",
+    "rdkit>=2023.9",
+]
+
+[project.optional-dependencies]
+# Mordred supplies the 2D descriptor block; only needed to rebuild the full
+# matrix, since the columns the fitted models use are shipped.
+mordred = ["mordred>=1.2"]
+# The notebook. CASPER (the 3D block) is NOT listed: it is not on PyPI, and the
+# name `casper` there belongs to an unrelated project. Its feature matrices are
+# shipped in features/ instead.
+notebook = ["jupyter", "nbformat", "matplotlib"]
+
+[project.urls]
+Homepage = "https://github.com/wdehaen/cyp-tdi-glassbox"
+
+[tool.setuptools]
+packages = ["glassbox"]

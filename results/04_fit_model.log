@@ -1,0 +1,3 @@
+CYP3A4: 152 terms {'morgan': 64, 'standard': 40, 'casper': 32, 'mordred': 16}  n_train=2528  MCC=0.3253+/-0.0101  rate=0.460 (1se)  prob_cut=0.258  -> models/CYP3A4.json
+CYP2D6: 88 terms {'standard': 40, 'morgan': 16, 'casper': 16, 'mordred': 16}  n_train=4213  MCC=0.1907+/-0.0070  rate=0.200 (1se)  prob_cut=0.103  -> models/CYP2D6.json
+wrote mordred_slim_*.npy with 29 of 1307 columns (713 kB vs 32 MB)

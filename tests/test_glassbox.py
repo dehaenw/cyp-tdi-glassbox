@@ -89,6 +89,22 @@ def test_every_morgan_term_is_a_real_substructure():
             assert Chem.MolFromSmiles(t['name'], sanitize=False) is not None, t['name']
 
 
+def test_casper_recompute_matches_the_shipped_matrix():
+    """The shipped 3D matrices must be exactly what the documented command
+    produces. Skipped unless `pip install casper-descriptor` is present."""
+    try:
+        import casper  # noqa: F401
+    except ImportError:
+        print('    (skipped: pip install casper-descriptor)', end='')
+        return
+    tr = pd.read_csv(R('data', 'tdi_train.csv'))
+    n = 12
+    X, names = F.compute_casper(tr.SMILES.tolist()[:n], n_jobs=4)
+    assert names == json.load(open(R('features', 'casper_names.json')))
+    assert np.allclose(X, np.load(R('features', 'casper_train.npy'))[:n],
+                       atol=1e-4, equal_nan=True)
+
+
 def test_round_trip_through_json():
     m = GlassBox.load(R('models', 'CYP3A4.json'))
     p = R('models', '_roundtrip.json')

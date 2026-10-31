@@ -100,7 +100,7 @@ Apache-2.0 on HuggingFace and is fetched by the first script.
 
 ```bash
 conda env create -f environment.yml && conda activate cyp-glassbox
-pip install -e .
+pip install -e .            # or  pip install -e ".[all]"  to recompute features
 
 python scripts/01_build_dataset.py      # fetch + labels + Butina CV groups  (~2 min)
 python scripts/02_featurize.py          # unfolded Morgan + fixed panel      (~1 min)
@@ -115,14 +115,23 @@ partition, labels and harvested set **byte-identically**, the CV numbers to four
 decimals, and the submitted test predictions **bit-identically on all 750 rows
 for both isoforms**.
 
-### A dependency caveat, stated plainly
+### On the two feature blocks that need extra packages
 
-The 3D block uses **CASPER**, which is not yet on PyPI. (`pip install casper`
-installs an unrelated project — do not.) So the **CASPER feature matrices are
-shipped** in `features/`, and everything above runs without it. You need CASPER
-itself only to recompute them (`02_featurize.py --casper`) or to render surface
-patches. Mordred *is* pip-installable, so only the ~29 columns the fitted models
-use are shipped (713 kB instead of 32 MB); the full matrix is a build step.
+Both are pip-installable, and both matrices are shipped anyway so a clean clone
+can explain and predict immediately:
+
+- **CASPER** (the 3D block) is `pip install casper-descriptor` — the
+  distribution is named `casper-descriptor` while the module is `casper`, so
+  `pip show casper` reports nothing even when it is installed, and `pip install
+  casper` fetches an unrelated project. Source:
+  [github.com/dehaenw/casper](https://github.com/dehaenw/casper) (MIT).
+  The matrices are committed (13 MB) so you can skip a 55-minute conformer run;
+  you need the package to recompute them (`02_featurize.py --casper`) or to
+  render surface patches.
+- **Mordred** (the 2D block) is `pip install mordred`. Only the ~29 columns the
+  fitted models reference are committed (713 kB instead of 32 MB), which is
+  enough for `explain()` and `predict`. The full matrix is a build step because
+  feature *selection* re-runs inside every CV fold.
 
 ## The ideas that did the work
 
@@ -219,8 +228,9 @@ results/        logs and JSON behind every number quoted above
 
 Code: MIT (see `LICENSE`). Data: the [OpenADMET CYP challenge
 dataset](https://huggingface.co/datasets/openadmet/cyp-challenge-train-test),
-Apache-2.0, fetched not redistributed. CASPER is a separate project by the same
-author and is not included here.
+Apache-2.0, fetched not redistributed. CASPER is a separate MIT project by the same
+author: [github.com/dehaenw/casper](https://github.com/dehaenw/casper),
+`pip install casper-descriptor`.
 
 `predictions/` is **git-ignored while the challenge is open** so this repo does
 not hand out test-set answers; `python scripts/05_predict.py` regenerates them.

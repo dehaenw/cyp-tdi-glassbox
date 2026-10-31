@@ -13,4 +13,8 @@ dependencies:
   - matplotlib
   - pip
   - pip:
-    - mordred>=1.2   # optional: only to rebuild the full 2D matrix
+    # Optional: both blocks' matrices are shipped in features/. These are needed
+    # only to RECOMPUTE them. Note the distribution name for CASPER -- the
+    # module is `casper`, and `pip install casper` is an unrelated project.
+    - casper-descriptor>=0.1
+    - mordred>=1.2

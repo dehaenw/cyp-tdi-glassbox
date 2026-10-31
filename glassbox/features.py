@@ -180,32 +180,52 @@ def casper_names_pretty(name):
         return name
 
 
+_CASPER_CFG = None
+
+
+def _casper_init(cfg):
+    """Pool initializer. The worker must be a module-level function and the
+    config must arrive through initargs, or multiprocessing cannot pickle
+    either -- a nested closure fails with "Can't get local object"."""
+    global _CASPER_CFG
+    _CASPER_CFG = cfg
+
+
+def _casper_one(arg):
+    i, s = arg
+    try:
+        import casper
+        return i, np.asarray(casper.featurize(s, _CASPER_CFG), dtype=np.float32)
+    except Exception:
+        return i, None        # one NaN row, not a dead run
+
+
 def compute_casper(smiles, n_confs=10, seed=61453, n_jobs=8):
-    """Optional: recompute the 3D block. Requires the CASPER package, which is
-    not yet on PyPI -- the precomputed matrices in features/ make this
-    unnecessary for replication. The knobs below are CASPER's defaults and a
-    45-configuration sweep confirmed they are already optimal (see README)."""
+    """Optional: recompute the 3D block.
+
+    Needs `pip install casper-descriptor` (the module is `casper`; `pip install
+    casper` is an unrelated project). https://github.com/dehaenw/casper
+
+    The shipped matrices in features/ make this unnecessary for replication --
+    it is a ~55 minute conformer run. The knobs below are CASPER's defaults, and
+    a 45-configuration sweep confirmed they are already optimal: see
+    results/casper_sweep_report.log.
+    """
     import casper
     from multiprocessing import Pool
     cfg = casper.CasperConfig(n_confs=n_confs, seed=seed,
                               properties=tuple(casper.PROPERTIES),
                               encoding=('hist', 'autocorr'), conf_pool=('mean', 'std'))
     names = list(casper.featurize('CCOc1ccccc1', cfg, return_names=True)[1])
-
-    def one(arg):
-        i, s = arg
-        try:
-            return i, np.asarray(casper.featurize(s, cfg), dtype=np.float32)
-        except Exception:
-            return i, None
     rows = [None] * len(smiles)
-    # longest-first: conformer cost varies ~13x here, and feeding the expensive
-    # molecules first removes an otherwise 12-minute straggler tail
+    # Longest-first. Conformer cost varies ~13x across a set like this, and
+    # feeding the expensive molecules first removes what was otherwise a
+    # 12-minute straggler tail at the end of the run.
     cost = [(Chem.MolFromSmiles(s).GetNumHeavyAtoms() if Chem.MolFromSmiles(s) else 0)
             for s in smiles]
     order = [(int(i), smiles[int(i)]) for i in np.argsort(-np.asarray(cost))]
-    with Pool(n_jobs) as pool:
-        for i, v in pool.imap_unordered(one, order, chunksize=1):
+    with Pool(n_jobs, initializer=_casper_init, initargs=(cfg,)) as pool:
+        for i, v in pool.imap_unordered(_casper_one, order, chunksize=1):
             rows[i] = v
     X = np.array([v if v is not None else np.full(len(names), np.nan, np.float32)
                   for v in rows], dtype=np.float32)

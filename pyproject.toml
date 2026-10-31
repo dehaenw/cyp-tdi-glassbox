@@ -20,16 +20,20 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Mordred supplies the 2D descriptor block; only needed to rebuild the full
-# matrix, since the columns the fitted models use are shipped.
+# The 3D block. NOTE the distribution name: the module is `casper`, the package
+# is `casper-descriptor`, and `pip install casper` is an unrelated project.
+# Needed only to RECOMPUTE the 3D features or render surface patches -- the
+# matrices themselves are shipped in features/.
+casper = ["casper-descriptor>=0.1"]
+# The 2D block. Needed only to rebuild the full matrix, since the columns the
+# fitted models use are shipped.
 mordred = ["mordred>=1.2"]
-# The notebook. CASPER (the 3D block) is NOT listed: it is not on PyPI, and the
-# name `casper` there belongs to an unrelated project. Its feature matrices are
-# shipped in features/ instead.
 notebook = ["jupyter", "nbformat", "matplotlib"]
+all = ["casper-descriptor>=0.1", "mordred>=1.2", "jupyter", "nbformat", "matplotlib"]
 
 [project.urls]
-Homepage = "https://github.com/wdehaen/cyp-tdi-glassbox"
+Homepage = "https://github.com/dehaenw/cyp-tdi-glassbox"
+"CASPER (3D descriptors)" = "https://github.com/dehaenw/casper"
 
 [tool.setuptools]
 packages = ["glassbox"]

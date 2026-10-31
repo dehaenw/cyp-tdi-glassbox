@@ -222,3 +222,14 @@ def compute_mordred(smiles):
     X = df.apply(pd.to_numeric, errors='coerce').values.astype(np.float32)
     keep = (np.isfinite(X).mean(0) > 0.98) & (np.nanstd(X, axis=0) > 0)
     return X[:, keep], [n for n, k in zip(df.columns, keep) if k]
+
+
+def require(path, how):
+    """Fail with an actionable message instead of a bare FileNotFoundError.
+
+    Large intermediates are not committed, so a fresh clone legitimately lacks
+    some of them; the fix is always one command and the user should be told it.
+    """
+    if not os.path.exists(path):
+        raise SystemExit(f'\nmissing: {path}\n  build it with:  {how}\n')
+    return path

@@ -29,7 +29,11 @@ a = ap.parse_args()
 CFG = json.load(open('models/config.json'))
 tr = pd.read_csv(f'{a.data}/tdi_train.csv')
 harv = pd.read_csv(f'{a.data}/tdi_harvested.csv')
-groups = np.load(f'{a.data}/groups.npy')
+groups = np.load(F.require(f'{a.data}/groups.npy',
+                           'python scripts/01_build_dataset.py'))
+F.require(f'{a.feat}/mordred_full_train.npy',
+          'python scripts/02_featurize.py --mordred   (~30 min; the full matrix '
+          'is needed because feature SELECTION re-runs inside every CV fold)')
 X, bits, prov = F.build_morgan(tr.SMILES.tolist(), cache=f'{a.feat}/morgan_train.pkl')
 MOR = np.load(f'{a.feat}/mordred_full_train.npy')
 MORN = json.load(open(f'{a.feat}/mordred_full_names.json'))

@@ -88,10 +88,50 @@ against a morgan-only baseline on those same seeds:
 
 `python scripts/03_crossval.py --baseline` reproduces this table exactly.
 
-An earlier version of this model (morgan + the fixed panel only, 104/56 terms)
-scored **macro MCC 0.3089** on the held-out challenge leaderboard, against a
-cross-validated 0.2434 — so CV is conservative here by roughly +0.065, which is
-consistent across the submissions we have.
+The last column is the CV ratio to a black-box ensemble measured under the
+same protocol. The leaderboard revised it to 94% on CYP3A4 and 88% on
+CYP2D6 — CV had the two isoforms the wrong way round, which is the next
+section.
+
+### On the blind leaderboard
+
+Two versions of this model were scored on the challenge's held-out set, one day
+apart, together with the black-box ensemble it is measured against:
+
+| | CYP3A4 | CYP2D6 | macro |
+|---|---|---|---|
+| morgan + fixed panel only (104 / 56 terms) | 0.3712 | **0.2467** | 0.3089 |
+| this model, + 3D & Mordred (152 / 88 terms) | **0.3835** | 0.2013 | 0.2924 |
+| black-box ensemble (LightGBM / TabICL / learned embeddings) | 0.4094 | 0.2796 | 0.3445 |
+
+**The 3D block did what it was added to do.** CYP3A4 rose +0.012, from 91% to
+**94% of the ensemble**, landing within 0.008 of a projection registered before
+the file was submitted. CV had under-predicted it by +0.058, consistent with
+every CYP3A4 measurement we have.
+
+**CYP2D6 went backwards, and the cause was the threshold, not the features.**
+Both submissions report a recall of 0.5017 — they found the *same* true
+inactivators — but the second one made 23% more positive calls to do it.
+Inverting the published metrics (identifiable up to the unknown size of the
+scored subset, which cancels out of MCC) gives 21 true against 78 false calls at
+the first threshold and 21 true against 101 false at the second. The extra calls
+bought nothing, and cost 0.045 MCC.
+
+The positive rate had moved from 0.14 to 0.20 because it is chosen by
+cross-validation, and that choice is biased:
+
+> **Grouped CV over-estimates the MCC-optimal positive rate, and the bias is
+> worse the rarer the class.** Grouped folds delete whole Butina clusters, so a
+> held-out compound's nearest training neighbour is at Tanimoto 0.426; a test
+> compound's is at 0.587. CV is therefore scoring a *weaker ranker* than the
+> real task presents, and for a weak ranker over-calling is MCC-optimal. At
+> CYP3A4's 29% prevalence that costs almost nothing. At CYP2D6's 7.1% it is
+> brutal: holding the ranking fixed, moving from 2.0x to 2.9x prevalence costs
+> 0.045 MCC on its own.
+
+So the honest leaderboard reading is 94% of the ensemble on CYP3A4 and, at a
+sanely chosen threshold, 88% on CYP2D6 — and that the operating point deserves
+as much care as the model, which is the opposite of where the effort went.
 
 ## Replication
 
@@ -194,8 +234,9 @@ effort as the positives and are the part most likely to save someone else time.
   100%. A term at 25% stability is a placeholder for a correlated family, not
   *the* chosen feature. Predictions are stable; credit assignment within a
   correlated group is not, and no interpretability method can fix that.
-- **It is still 0.2580 macro MCC.** This is a genuinely hard endpoint with noisy
-  labels, and the model is interpretable, not accurate in absolute terms.
+- **It is still 0.2580 macro MCC in CV, 0.2924 on the leaderboard.** This is a
+  genuinely hard endpoint with noisy labels, and the model is interpretable, not
+  accurate in absolute terms.
 - **The 3D block's absolute values carry conformer-seed noise** of about 0.007
   CV MCC. The seed was fixed arbitrarily and never selected on, so the reported
   numbers are unbiased — but a different seed gives a slightly different model.
@@ -204,6 +245,9 @@ effort as the positives and are the part most likely to save someone else time.
   population-level call and cannot be made for a single molecule, so the model
   also stores `prob_cut`, the out-of-fold probability at that rate. They
   disagree on 35–39 of 750 compounds; `05_predict.py` reports how many.
+  This is not a detail. The single largest swing in anything we measured —
+  larger than the 3D block, larger than every feature family we tested — came
+  from the positive rate on CYP2D6 moving by 0.06, with the model unchanged.
 - **The CYP2D6 harvested negatives are screen-derived**, not pIC50-confirmed. It
   was the right call here and the leaderboard supported it, but they are a
   weaker label than a measured one.

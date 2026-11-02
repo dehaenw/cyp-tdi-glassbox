@@ -130,6 +130,26 @@ deployed CYP3A4 threshold turns out to be bracketed at its optimum — the cut
 bands convert above breakeven and the add bands below it, so the right move was
 to change nothing. At 7% it overshoots by nearly a factor of two.
 
+### Against the organizers' baselines
+
+The challenge shipped three non-linear baselines, scored on the same held-out
+set and visible on the public leaderboard. They are the only like-for-like
+comparison anyone else can check:
+
+| | macro MCC | accuracy | precision | recall | F1 |
+|---|---|---|---|---|---|
+| **this model** (one logistic regression, 88 / 152 terms) | **0.3423** | 0.7744 | 0.3702 | 0.6435 | 0.4679 |
+| TabICL baseline | 0.3250 | 0.8446 | 0.4781 | 0.3690 | 0.4135 |
+| XGB baseline | 0.2885 | 0.8405 | 0.4960 | 0.2836 | 0.3558 |
+| LGBM baseline | 0.2881 | 0.8391 | 0.4797 | 0.2980 | 0.3608 |
+
+The linear model is ahead of all three on MCC while being *behind* all three on
+accuracy and precision. That is the operating point again, now visible in public
+data: the baselines call few positives and are right more often when they do
+(precision 0.48-0.50, recall 0.28-0.37), which maximises accuracy on an
+imbalanced set and leaves MCC on the table. This model calls more and converts
+recall 0.6435 into the higher MCC. On a rare-positive endpoint, accuracy and
+precision are the wrong things to read.
 
 ## Replication
 

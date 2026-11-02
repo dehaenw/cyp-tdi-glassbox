@@ -89,19 +89,20 @@ against a morgan-only baseline on those same seeds:
 `python scripts/03_crossval.py --baseline` reproduces this table exactly.
 
 The last column is the CV ratio to a black-box ensemble measured under the
-same protocol. The leaderboard revised it to 94% on CYP3A4 and 88% on
+same protocol. The leaderboard revised it to 94% on CYP3A4 and 108% on
 CYP2D6 — CV had the two isoforms the wrong way round, which is the next
 section.
 
 ### On the blind leaderboard
 
-Two versions of this model were scored on the challenge's held-out set, one day
-apart, together with the black-box ensemble it is measured against:
+Three versions of this model were scored on the challenge's held-out set over
+three days, together with the black-box ensemble it is measured against:
 
 | | CYP3A4 | CYP2D6 | macro |
 |---|---|---|---|
-| morgan + fixed panel only (104 / 56 terms) | 0.3712 | **0.2467** | 0.3089 |
-| this model, + 3D & Mordred (152 / 88 terms) | **0.3835** | 0.2013 | 0.2924 |
+| morgan + fixed panel only (104 / 56 terms), rate 0.14 | 0.3712 | 0.2467 | 0.3089 |
+| this model, + 3D & Mordred (152 / 88 terms), rate 0.20 | **0.3835** | 0.2013 | 0.2924 |
+| same two rankings, CYP2D6 rate cut to 0.112 | **0.3835** | **0.3011** | **0.3423** |
 | black-box ensemble (LightGBM / TabICL / learned embeddings) | 0.4094 | 0.2796 | 0.3445 |
 
 **The 3D block did what it was added to do.** CYP3A4 rose +0.012, from 91% to
@@ -109,16 +110,15 @@ apart, together with the black-box ensemble it is measured against:
 the file was submitted. CV had under-predicted it by +0.058, consistent with
 every CYP3A4 measurement we have.
 
-**CYP2D6 went backwards, and the cause was the threshold, not the features.**
-Both submissions report a recall of 0.5017 — they found the *same* true
-inactivators — but the second one made 23% more positive calls to do it.
-Inverting the published metrics (identifiable up to the unknown size of the
-scored subset, which cancels out of MCC) gives 21 true against 78 false calls at
-the first threshold and 21 true against 101 false at the second. The extra calls
-bought nothing, and cost 0.045 MCC.
+**CYP2D6's swing of 0.10 was entirely the threshold.** All three submissions
+report a recall of 0.5017 — they found the *same* true inactivators — while the
+number of positive calls ran 105, 150, 84. Inverting the published metrics
+(identifiable up to the unknown size of the scored subset, which cancels out of
+MCC) recovers the same 22.3 true positives every time, against 83, 107 and 60
+false ones. The extra calls bought nothing; removing them was worth +0.055.
 
-The positive rate had moved from 0.14 to 0.20 because it is chosen by
-cross-validation, and that choice is biased:
+The positive rate had moved because it is chosen by cross-validation, and that
+choice is biased:
 
 > **Grouped CV over-estimates the MCC-optimal positive rate, and the bias is
 > worse the rarer the class.** Grouped folds delete whole Butina clusters, so a
@@ -126,12 +126,29 @@ cross-validation, and that choice is biased:
 > compound's is at 0.587. CV is therefore scoring a *weaker ranker* than the
 > real task presents, and for a weak ranker over-calling is MCC-optimal. At
 > CYP3A4's 29% prevalence that costs almost nothing. At CYP2D6's 7.1% it is
-> brutal: holding the ranking fixed, moving from 2.0x to 2.9x prevalence costs
-> 0.045 MCC on its own.
+> brutal.
 
-So the honest leaderboard reading is 94% of the ensemble on CYP3A4 and, at a
-sanely chosen threshold, 88% on CYP2D6 — and that the operating point deserves
-as much care as the model, which is the opposite of where the effort went.
+The third submission was built to measure that bias rather than argue about it.
+Holding CYP3A4 byte-identical makes the macro arithmetic exact, so cutting only
+the CYP2D6 rate reads the isoform off directly. Aligning the cross-validated
+cumulative-recall curve to the test curve *by recall* then quantifies the bias
+per isoform:
+
+| | CV depth at matched recall | test depth | overshoot |
+|---|---|---|---|
+| CYP3A4 (29% prevalence) | 377 of 706 | 343 of 706 | **1.10×** |
+| CYP2D6 (7.1% prevalence) | 156 of 628 | 83 of 628 | **1.89×** |
+
+At 29% prevalence cross-validation picks the operating point correctly, and the
+deployed CYP3A4 threshold turns out to be bracketed at its optimum — the cut
+bands convert above breakeven and the add bands below it, so the right move was
+to change nothing. At 7% it overshoots by nearly a factor of two.
+
+So the honest leaderboard reading is **94% of the ensemble on CYP3A4, 108% on
+CYP2D6, and 99% of its macro** — from 152 and 88 readable terms against learned
+embeddings, gradient boosting and in-context tabular models. The operating point
+deserved as much care as the model, which is the opposite of where the effort
+went.
 
 ## Replication
 

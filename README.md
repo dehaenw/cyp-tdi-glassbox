@@ -7,7 +7,7 @@ Challenge](https://openadmet.ghost.io/announcing-openadmets-cyp-inhibition-blind
 embeddings, no ensembling — and every term is a substructure you can draw, a
 physical property, or a surface feature with a length scale.
 
-It reaches **93% of the macro MCC of the black-box ensemble** it was built to be
+It reaches **93% of the macro MCC of our internal black-box ensemble** it was built to be
 an honest alternative to, and **106% on CYP2D6**.
 
 ```
@@ -88,7 +88,7 @@ against a morgan-only baseline on those same seeds:
 
 `python scripts/03_crossval.py --baseline` reproduces this table exactly.
 
-The last column is the CV ratio to a black-box ensemble measured under the
+The last column is the CV ratio to our internal black-box ensemble measured under the
 same protocol. The leaderboard revised it to 94% on CYP3A4 and 108% on
 CYP2D6 — CV had the two isoforms the wrong way round, which is the next
 section.
@@ -144,11 +144,6 @@ deployed CYP3A4 threshold turns out to be bracketed at its optimum — the cut
 bands convert above breakeven and the add bands below it, so the right move was
 to change nothing. At 7% it overshoots by nearly a factor of two.
 
-So the honest leaderboard reading is **94% of the ensemble on CYP3A4, 108% on
-CYP2D6, and 99% of its macro** — from 152 and 88 readable terms against learned
-embeddings, gradient boosting and in-context tabular models. The operating point
-deserved as much care as the model, which is the opposite of where the effort
-went.
 
 ## Replication
 
@@ -171,24 +166,6 @@ Verified end to end: the pipeline above reproduces the research code's Butina
 partition, labels and harvested set **byte-identically**, the CV numbers to four
 decimals, and the submitted test predictions **bit-identically on all 750 rows
 for both isoforms**.
-
-### On the two feature blocks that need extra packages
-
-Both are pip-installable, and both matrices are shipped anyway so a clean clone
-can explain and predict immediately:
-
-- **CASPER** (the 3D block) is `pip install casper-descriptor` — the
-  distribution is named `casper-descriptor` while the module is `casper`, so
-  `pip show casper` reports nothing even when it is installed, and `pip install
-  casper` fetches an unrelated project. Source:
-  [github.com/dehaenw/casper](https://github.com/dehaenw/casper) (MIT).
-  The matrices are committed (13 MB) so you can skip a 55-minute conformer run;
-  you need the package to recompute them (`02_featurize.py --casper`) or to
-  render surface patches.
-- **Mordred** (the 2D block) is `pip install mordred`. Only the ~29 columns the
-  fitted models reference are committed (713 kB instead of 32 MB), which is
-  enough for `explain()` and `predict`. The full matrix is a build step because
-  feature *selection* re-runs inside every CV fold.
 
 ## The ideas that did the work
 
@@ -289,9 +266,7 @@ results/        logs and JSON behind every number quoted above
 
 Code: MIT (see `LICENSE`). Data: the [OpenADMET CYP challenge
 dataset](https://huggingface.co/datasets/openadmet/cyp-challenge-train-test),
-Apache-2.0, fetched not redistributed. CASPER is a separate MIT project by the same
-author: [github.com/dehaenw/casper](https://github.com/dehaenw/casper),
-`pip install casper-descriptor`.
+Apache-2.0, fetched not redistributed.
 
 `predictions/` is **git-ignored while the challenge is open** so this repo does
 not hand out test-set answers; `python scripts/05_predict.py` regenerates them.
